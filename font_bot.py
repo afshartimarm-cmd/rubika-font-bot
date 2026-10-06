@@ -10,7 +10,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 # تنظیمات
 # =========================================
 
-TOKEN = os.getenv("TOKEN")
+TOKEN = os.getenv("CGACAE0KAWIWSHTBRSGNZHJGZZBQCPTZGFFEWGIPLJBLLDXNGJDUGVKWIOXOCXSI")
 
 if not TOKEN:
     raise ValueError("❌ متغیر TOKEN در Render تنظیم نشده است.")
