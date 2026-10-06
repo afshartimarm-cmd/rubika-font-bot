@@ -6,9 +6,9 @@ import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 
-# =========================================
+# ============================================================
 # تنظیمات
-# =========================================
+# ============================================================
 
 TOKEN = os.getenv("CGACAE0KAWIWSHTBRSGNZHJGZZBQCPTZGFFEWGIPLJBLLDXNGJDUGVKWIOXOCXSI")
 
@@ -16,32 +16,27 @@ if not TOKEN:
     raise ValueError("❌ متغیر TOKEN در Render تنظیم نشده است.")
 
 BASE_URL = f"https://botapi.rubika.ir/v3/{TOKEN}"
-
 offset_id = None
 
 
-# =========================================
-# HTTP SERVER برای Render
-# =========================================
+# ============================================================
+# HTTP SERVER مخصوص Render
+# ============================================================
 
 class HealthHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
 
-        if self.path == "/" or self.path == "/health":
+        if self.path in ("/", "/health"):
 
             self.send_response(200)
-
             self.send_header(
                 "Content-Type",
                 "text/plain; charset=utf-8"
             )
-
             self.end_headers()
 
-            self.wfile.write(
-                b"OK"
-            )
+            self.wfile.write(b"OK")
 
         else:
 
@@ -49,17 +44,12 @@ class HealthHandler(BaseHTTPRequestHandler):
             self.end_headers()
 
     def log_message(self, format, *args):
-        pass
+        return
 
 
 def start_health_server():
 
-    port = int(
-        os.environ.get(
-            "PORT",
-            "10000"
-        )
-    )
+    port = int(os.environ.get("PORT", "10000"))
 
     try:
 
@@ -83,7 +73,6 @@ def start_health_server():
         )
 
 
-# اول سرور Render را روشن می‌کنیم
 health_thread = threading.Thread(
     target=start_health_server,
     daemon=True
@@ -94,9 +83,9 @@ health_thread.start()
 time.sleep(1)
 
 
-# =========================================
+# ============================================================
 # RUBIKA API
-# =========================================
+# ============================================================
 
 def api(method, data=None):
 
@@ -113,7 +102,6 @@ def api(method, data=None):
                 data,
                 ensure_ascii=False
             ).encode("utf-8"),
-
             headers={
                 "Content-Type": "application/json"
             }
@@ -124,10 +112,7 @@ def api(method, data=None):
             timeout=30
         ) as response:
 
-            result = response.read().decode(
-                "utf-8"
-            )
-
+            result = response.read().decode("utf-8")
             return json.loads(result)
 
     except Exception as e:
@@ -141,15 +126,11 @@ def api(method, data=None):
         return None
 
 
-# =========================================
+# ============================================================
 # ارسال پیام
-# =========================================
+# ============================================================
 
-def send_message(
-    chat_id,
-    text,
-    reply_to=None
-):
+def send_message(chat_id, text, reply_to=None):
 
     data = {
         "chat_id": chat_id,
@@ -170,886 +151,184 @@ def send_message(
             flush=True
         )
 
-    return result 
+    return result
+
 
 # ============================================================
-# فونت‌های انگلیسی
+# حروف انگلیسی
 # ============================================================
 
-NORMAL_UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-NORMAL_LOWER = "abcdefghijklmnopqrstuvwxyz"
+UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+LOWER = "abcdefghijklmnopqrstuvwxyz"
 
 
-# ------------------------------------------------------------
-# Bold
-# ------------------------------------------------------------
+BOLD_U = "𝐀𝐁𝐂𝐃𝐄𝐅𝐆𝐇𝐈𝐉𝐊𝐋𝐌𝐍𝐎𝐏𝐐𝐑𝐒𝐓𝐔𝐕𝐖𝐗𝐘𝐙"
+BOLD_L = "𝐚𝐛𝐜𝐝𝐞𝐟𝐠𝐡𝐢𝐣𝐤𝐥𝐦𝐧𝐨𝐩𝐪𝐫𝐬𝐭𝐮𝐯𝐰𝐱𝐲𝐳"
 
-BOLD_UPPER = (
-    "𝐀𝐁𝐂𝐃𝐄𝐅𝐆𝐇𝐈𝐉𝐊𝐋𝐌𝐍𝐎𝐏𝐐𝐑𝐒𝐓𝐔𝐕𝐖𝐗𝐘𝐙"
-)
+ITALIC_U = "𝐴𝐵𝐶𝐷𝐸𝐹𝐺𝐻𝐼𝐽𝐾𝐿𝑀𝑁𝑂𝑃𝑄𝑅𝑆𝑇𝑈𝑉𝑊𝑋𝑌𝑍"
+ITALIC_L = "𝑎𝑏𝑐𝑑𝑒𝑓𝑔ℎ𝑖𝑗𝑘𝑙𝑚𝑛𝑜𝑝𝑞𝑟𝑠𝑡𝑢𝑣𝑤𝑥𝑦𝑧"
 
-BOLD_LOWER = (
-    "𝐚𝐛𝐜𝐝𝐞𝐟𝐠𝐡𝐢𝐣𝐤𝐥𝐦𝐧𝐨𝐩𝐪𝐫𝐬𝐭𝐮𝐯𝐰𝐱𝐲𝐳"
-)
+BOLD_ITALIC_U = "𝑨𝑩𝑪𝑫𝑬𝑭𝑮𝑯𝑰𝑱𝑲𝑳𝑴𝑵𝑶𝑷𝑸𝑹𝑺𝑻𝑼𝑽𝑾𝑿𝒀𝒁"
+BOLD_ITALIC_L = "𝒂𝒃𝒄𝒅𝒆𝒇𝒈𝒉𝒊𝒋𝒌𝒍𝒎𝒏𝒐𝒑𝒒𝒓𝒔𝒕𝒖𝒗𝒘𝒙𝒚𝒛"
 
+SCRIPT_U = "𝒜ℬ𝒞𝒟ℰℱ𝒢ℋℐ𝒥𝒦ℒℳ𝒩𝒪𝒫𝒬ℛ𝒮𝒯𝒰𝒱𝒲𝒳𝒴𝒵"
+SCRIPT_L = "𝒶𝒷𝒸𝒹ℯ𝒻ℊ𝒽𝒾𝒿𝓀𝓁𝓂𝓃ℴ𝓅𝓆𝓇𝓈𝓉𝓊𝓋𝓌𝓍𝓎𝓏"
 
-# ------------------------------------------------------------
-# Italic
-# ------------------------------------------------------------
+BOLD_SCRIPT_U = "𝓐𝓑𝓒𝓓𝓔𝓕𝓖𝓗𝓘𝓙𝓚𝓛𝓜𝓝𝓞𝓟𝓠𝓡𝓢𝓣𝓤𝓥𝓦𝓧𝓨𝓩"
+BOLD_SCRIPT_L = "𝓪𝓫𝓬𝓭𝓮𝓯𝓰𝓱𝓲𝓳𝓴𝓵𝓶𝓷𝓸𝓹𝓺𝓻𝓼𝓽𝓾𝓿𝔀𝔁𝔂𝔃"
 
-ITALIC_UPPER = (
-    "𝐴𝐵𝐶𝐷𝐸𝐹𝐺𝐻𝐼𝐽𝐾𝐿𝑀𝑁𝑂𝑃𝑄𝑅𝑆𝑇𝑈𝑉𝑊𝑋𝑌𝑍"
-)
+FRAKTUR_U = "𝔄𝔅ℭ𝔇𝔈𝔉𝔊ℌℑ𝔍𝔎𝔏𝔐𝔑𝔒𝔓𝔔ℜ𝔖𝔗𝔘𝔙𝔚𝔛𝔜ℨ"
+FRAKTUR_L = "𝔞𝔟𝔠𝔡𝔢𝔣𝔤𝔥𝔦𝔧𝔨𝔩𝔪𝔫𝔬𝔭𝔮𝔯𝔰𝔱𝔲𝔳𝔴𝔵𝔶𝔷"
 
-ITALIC_LOWER = (
-    "𝑎𝑏𝑐𝑑𝑒𝑓𝑔ℎ𝑖𝑗𝑘𝑙𝑚𝑛𝑜𝑝𝑞𝑟𝑠𝑡𝑢𝑣𝑤𝑥𝑦𝑧"
-)
+BOLD_FRAKTUR_U = "𝕬𝕭𝕮𝕯𝕰𝕱𝕲𝕳𝕴𝕵𝕶𝕷𝕸𝕹𝕺𝕻𝕼𝕽𝕾𝕿𝖀𝖁𝖂𝖃𝖄𝖅"
+BOLD_FRAKTUR_L = "𝖆𝖇𝖈𝖉𝖊𝖋𝖌𝖍𝖎𝖏𝖐𝖑𝖒𝖓𝖔𝖕𝖖𝖗𝖘𝖙𝖚𝖛𝖜𝖝𝖞𝖟"
 
+DOUBLE_U = "𝔸𝔹ℂ𝔻𝔼𝔽𝔾ℍ𝕀𝕁𝕂𝕃𝕄ℕ𝕆ℙℚℝ𝕊𝕋𝕌𝕍𝕎𝕏𝕐ℤ"
+DOUBLE_L = "𝕒𝕓𝕔𝕕𝕖𝕗𝕘𝕙𝕚𝕛𝕜𝕝𝕞𝕟𝕠𝕡𝕢𝕣𝕤𝕥𝕦𝕧𝕨𝕩𝕪𝕫"
 
-# ------------------------------------------------------------
-# Bold Italic
-# ------------------------------------------------------------
+SANS_U = "𝖠𝖡𝖢𝖣𝖤𝖥𝖦𝖧𝖨𝖩𝖪𝖫𝖬𝖭𝖮𝖯𝖰𝖱𝖲𝖳𝖴𝖵𝖶𝖷𝖸𝖹"
+SANS_L = "𝖺𝖻𝖼𝖽𝖾𝖿𝗀𝗁𝗂𝗃𝗄𝗅𝗆𝗇𝗈𝗉𝗊𝗋𝗌𝗍𝗎𝗏𝗐𝗑𝗒𝗓"
 
-BOLD_ITALIC_UPPER = (
-    "𝑨𝑩𝑪𝑫𝑬𝑭𝑮𝑯𝑰𝑱𝑲𝑳𝑴𝑵𝑶𝑷𝑸𝑹𝑺𝑻𝑼𝑽𝑾𝑿𝒀𝒁"
-)
+SANS_BOLD_U = "𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭"
+SANS_BOLD_L = "𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇"
 
-BOLD_ITALIC_LOWER = (
-    "𝒂𝒃𝒄𝒅𝒆𝒇𝒈𝒉𝒊𝒋𝒌𝒍𝒎𝒏𝒐𝒑𝒒𝒓𝒔𝒕𝒖𝒗𝒘𝒙𝒚𝒛"
-)
+SANS_ITALIC_U = "𝘈𝘉𝘊𝘋𝘌𝘍𝘎𝘏𝘐𝘑𝘒𝘓𝘔𝘕𝘖𝘗𝘘𝘙𝘚𝘛𝘜𝘝𝘞𝘟𝘠𝘡"
+SANS_ITALIC_L = "𝘢𝘣𝘤𝘥𝘦𝘧𝘨𝘩𝘪𝘫𝘬𝘭𝘮𝘯𝘰𝘱𝘲𝘳𝘴𝘵𝘶𝘷𝘸𝘹𝘺𝘻"
 
+SANS_BOLD_ITALIC_U = "𝘼𝘽𝘾𝘿𝙀𝙁𝙂𝙃𝙄𝙅𝙆𝙇𝙈𝙉𝙊𝙋𝙌𝙍𝙎𝙏𝙐𝙑𝙒𝙓𝙔𝙕"
+SANS_BOLD_ITALIC_L = "𝙖𝙗𝙘𝙙𝙚𝙛𝙜𝙝𝙞𝙟𝙠𝙡𝙢𝙣𝙤𝙥𝙦𝙧𝙨𝙩𝙪𝙫𝙬𝙭𝙮𝙯"
 
-# ------------------------------------------------------------
-# Script
-# ------------------------------------------------------------
+MONO_U = "𝙰𝙱𝙲𝙳𝙴𝙵𝙶𝙷𝙸𝙹𝙺𝙻𝙼𝙽𝙾𝙿𝚀𝚁𝚂𝚃𝚄𝚅𝚆𝚇𝚈𝚉"
+MONO_L = "𝚊𝚋𝚌𝚍𝚎𝚏𝚐𝚑𝚒𝚓𝚔𝚕𝚖𝚗𝚘𝚙𝚚𝚛𝚜𝚝𝚞𝚟𝚠𝚡𝚢𝚣"
 
-SCRIPT_UPPER = (
-    "𝒜ℬ𝒞𝒟ℰℱ𝒢ℋℐ𝒥𝒦ℒℳ𝒩𝒪𝒫𝒬ℛ𝒮𝒯𝒰𝒱𝒲𝒳𝒴𝒵"
-)
+FULL_U = "ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ"
+FULL_L = "ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ"
 
-SCRIPT_LOWER = (
-    "𝒶𝒷𝒸𝒹ℯ𝒻ℊ𝒽𝒾𝒿𝓀𝓁𝓂𝓃ℴ𝓅𝓆𝓇𝓈𝓉𝓊𝓋𝓌𝓍𝓎𝓏"
-)
 
+# ============================================================
+# تبدیل فونت
+# ============================================================
 
-# ------------------------------------------------------------
-# Bold Script
-# ------------------------------------------------------------
-
-BOLD_SCRIPT_UPPER = (
-    "𝓐𝓑𝓒𝓓𝓔𝓕𝓖𝓗𝓘𝓙𝓚𝓛𝓜𝓝𝓞𝓟𝓠𝓡𝓢𝓣𝓤𝓥𝓦𝓧𝓨𝓩"
-)
-
-BOLD_SCRIPT_LOWER = (
-    "𝓪𝓫𝓬𝓭𝓮𝓯𝓰𝓱𝓲𝓳𝓴𝓵𝓶𝓷𝓸𝓹𝓺𝓻𝓼𝓽𝓾𝓿𝔀𝔁𝔂𝔃"
-)
-
-
-# ------------------------------------------------------------
-# Fraktur
-# ------------------------------------------------------------
-
-FRAKTUR_UPPER = (
-    "𝔄𝔅ℭ𝔇𝔈𝔉𝔊ℌℑ𝔍𝔎𝔏𝔐𝔑𝔒𝔓𝔔ℜ𝔖𝔗𝔘𝔙𝔚𝔛𝔜ℨ"
-)
-
-FRAKTUR_LOWER = (
-    "𝔞𝔟𝔠𝔡𝔢𝔣𝔤𝔥𝔦𝔧𝔨𝔩𝔪𝔫𝔬𝔭𝔮𝔯𝔰𝔱𝔲𝔳𝔴𝔵𝔶𝔷"
-)
-
-
-# ------------------------------------------------------------
-# Bold Fraktur
-# ------------------------------------------------------------
-
-BOLD_FRAKTUR_UPPER = (
-    "𝕬𝕭𝕮𝕯𝕰𝕱𝕲𝕳𝕴𝕵𝕶𝕷𝕸𝕹𝕺𝕻𝕼𝕽𝕾𝕿𝖀𝖁𝖂𝖃𝖄𝖅"
-)
-
-BOLD_FRAKTUR_LOWER = (
-    "𝖆𝖇𝖈𝖉𝖊𝖋𝖌𝖍𝖎𝖏𝖐𝖑𝖒𝖓𝖔𝖕𝖖𝖗𝖘𝖙𝖚𝖛𝖜𝖝𝖞𝖟"
-)
-
-
-# ------------------------------------------------------------
-# Double
-# ------------------------------------------------------------
-
-DOUBLE_UPPER = (
-    "𝔸𝔹ℂ𝔻𝔼𝔽𝔾ℍ𝕀𝕁𝕂𝕃𝕄ℕ𝕆ℙℚℝ𝕊𝕋𝕌𝕍𝕎𝕏𝕐ℤ"
-)
-
-DOUBLE_LOWER = (
-    "𝕒𝕓𝕔𝕕𝕖𝕗𝕘𝕙𝕚𝕛𝕜𝕝𝕞𝕟𝕠𝕡𝕢𝕣𝕤𝕥𝕦𝕧𝕨𝕩𝕪𝕫"
-)
-
-
-# ------------------------------------------------------------
-# Sans
-# ------------------------------------------------------------
-
-SANS_UPPER = (
-    "𝖠𝖡𝖢𝖣𝖤𝖥𝖦𝖧𝖨𝖩𝖪𝖫𝖬𝖭𝖮𝖯𝖰𝖱𝖲𝖳𝖴𝖵𝖶𝖷𝖸𝖹"
-)
-
-SANS_LOWER = (
-    "𝖺𝖻𝖼𝖽𝖾𝖿𝗀𝗁𝗂𝗃𝗄𝗅𝗆𝗇𝗈𝗉𝗊𝗋𝗌𝗍𝗎𝗏𝗐𝗑𝗒𝗓"
-)
-
-
-# ------------------------------------------------------------
-# Sans Bold
-# ------------------------------------------------------------
-
-SANS_BOLD_UPPER = (
-    "𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭"
-)
-
-SANS_BOLD_LOWER = (
-    "𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇"
-)
-
-
-# ------------------------------------------------------------
-# Sans Italic
-# ------------------------------------------------------------
-
-SANS_ITALIC_UPPER = (
-    "𝘈𝘉𝘊𝘋𝘌𝘍𝘎𝘏𝘐𝘑𝘒𝘓𝘔𝘕𝘖𝘗𝘘𝘙𝘚𝘛𝘜𝘝𝘞𝘟𝘠𝘡"
-)
-
-SANS_ITALIC_LOWER = (
-    "𝘢𝘣𝘤𝘥𝘦𝘧𝘨𝘩𝘪𝘫𝘬𝘭𝘮𝘯𝘰𝘱𝘲𝘳𝘴𝘵𝘶𝘷𝘸𝘹𝘺𝘻"
-)
-
-
-# ------------------------------------------------------------
-# Sans Bold Italic
-# ------------------------------------------------------------
-
-SANS_BOLD_ITALIC_UPPER = (
-    "𝘼𝘽𝘾𝘿𝙀𝙁𝙂𝙃𝙄𝙅𝙆𝙇𝙈𝙉𝙊𝙋𝙌𝙍𝙎𝙏𝙐𝙑𝙒𝙓𝙔𝙕"
-)
-
-SANS_BOLD_ITALIC_LOWER = (
-    "𝙖𝙗𝙘𝙙𝙚𝙛𝙜𝙝𝙞𝙟𝙠𝙡𝙢𝙣𝙤𝙥𝙦𝙧𝙨𝙩𝙪𝙫𝙬𝙭𝙮𝙯"
-)
-
-
-# ------------------------------------------------------------
-# Monospace
-# ------------------------------------------------------------
-
-MONO_UPPER = (
-    "𝙰𝙱𝙲𝙳𝙴𝙵𝙶𝙷𝙸𝙹𝙺𝙻𝙼𝙽𝙾𝙿𝚀𝚁𝚂𝚃𝚄𝚅𝚆𝚇𝚈𝚉"
-)
-
-MONO_LOWER = (
-    "𝚊𝚋𝚌𝚍𝚎𝚏𝚐𝚑𝚒𝚓𝚔𝚕𝚖𝚗𝚘𝚙𝚚𝚛𝚜𝚝𝚞𝚟𝚠𝚡𝚢𝚣"
-)
-
-
-# ------------------------------------------------------------
-# Fullwidth
-# ------------------------------------------------------------
-
-FULLWIDTH_UPPER = (
-    "ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ"
-)
-
-FULLWIDTH_LOWER = (
-    "ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ"
-)
-
-
-# ------------------------------------------------------------
-# Circled
-# ------------------------------------------------------------
-
-CIRCLED_UPPER = (
-    "ⒶⒷⒸⒹⒺⒻⒼⒽⒾⒿⓀⓁⓂⓃⓄⓅⓆⓇⓈⓉⓊⓋⓌⓍⓎⓏ"
-)
-
-CIRCLED_LOWER = (
-    "ⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓧⓨⓩ"
-)
-
-
-# ------------------------------------------------------------
-# Negative Circled
-# ------------------------------------------------------------
-
-NEG_CIRCLED_UPPER = (
-    "🅐🅑🅒🅓🅔🅕🅖🅗🅘🅙🅚🅛🅜🅝🅞🅟🅠🅡🅢🅣🅤🅥🅦🅧🅨🅩"
-)
-
-NEG_CIRCLED_LOWER = NEG_CIRCLED_UPPER
-
-
-# ------------------------------------------------------------
-# Squared
-# ------------------------------------------------------------
-
-SQUARED_UPPER = (
-    "🄰🄱🄲🄳🄴🄵🄶🄷🄸🄹🄺🄻🄼🄽🄾🄿🅀🅁🅂🅃🅄🅅🅆🅇🅈🅉"
-)
-
-SQUARED_LOWER = SQUARED_UPPER
-
-
-# ------------------------------------------------------------
-# Negative Squared
-# ------------------------------------------------------------
-
-NEG_SQUARED_UPPER = (
-    "🅰🅱🅲🅳🅴🅵🅶🅷🅸🅹🅺🅻🅼🅽🅾🅿🆀🆁🆂🆃🆄🆅🆆🆇🆈🆉"
-)
-
-NEG_SQUARED_LOWER = NEG_SQUARED_UPPER
-
-
-# ------------------------------------------------------------
-# Parenthesized
-# ------------------------------------------------------------
-
-PAREN_UPPER = (
-    "⒜⒝⒞⒟⒠⒡⒢⒣⒤⒥⒦⒧⒨⒩⒪⒫⒬⒭⒮⒯⒰⒱⒲⒳⒴⒵"
-)
-
-PAREN_LOWER = PAREN_UPPER
-
-
-# ------------------------------------------------------------
-# Small Caps
-# ------------------------------------------------------------
-
-SMALL_CAPS = {
-    "a": "ᴀ",
-    "b": "ʙ",
-    "c": "ᴄ",
-    "d": "ᴅ",
-    "e": "ᴇ",
-    "f": "ꜰ",
-    "g": "ɢ",
-    "h": "ʜ",
-    "i": "ɪ",
-    "j": "ᴊ",
-    "k": "ᴋ",
-    "l": "ʟ",
-    "m": "ᴍ",
-    "n": "ɴ",
-    "o": "ᴏ",
-    "p": "ᴘ",
-    "q": "ǫ",
-    "r": "ʀ",
-    "s": "s",
-    "t": "ᴛ",
-    "u": "ᴜ",
-    "v": "ᴠ",
-    "w": "ᴡ",
-    "x": "x",
-    "y": "ʏ",
-    "z": "ᴢ"
-}
-
-
-# ------------------------------------------------------------
-# تبدیل حروف
-# ------------------------------------------------------------
-
-def unicode_font(
-    text,
-    upper,
-    lower
-):
+def unicode_font(text, upper, lower):
 
     result = ""
 
     for char in text:
 
-        if char in NORMAL_UPPER:
+        if char in UPPER:
+            result += upper[UPPER.index(char)]
 
-            index = NORMAL_UPPER.index(char)
-
-            result += upper[index]
-
-        elif char in NORMAL_LOWER:
-
-            index = NORMAL_LOWER.index(char)
-
-            result += lower[index]
+        elif char in LOWER:
+            result += lower[LOWER.index(char)]
 
         else:
-
             result += char
 
     return result
 
 
-# ============================================================
-# استایل‌های ترکیبی تمیز
-# ============================================================
-
-def combine_style(
-    text,
-    mark
-):
+def combine_style(text, mark):
 
     result = ""
 
     for char in text:
 
         if char.isalpha():
-
             result += char + mark
-
         else:
-
             result += char
 
     return result
 
 
-def reverse_text(text):
+# ============================================================
+# Small Caps
+# ============================================================
 
-    return text[::-1]
-
-
-def spaced_text(text):
-
-    return " ".join(list(text))
-
-
-def boxed_text(text):
-
-    return "【" + text + "】"
-
-
-def bracket_text(text):
-
-    return "『" + text + "』"
+SMALL_CAPS = {
+    "a": "ᴀ", "b": "ʙ", "c": "ᴄ", "d": "ᴅ",
+    "e": "ᴇ", "f": "ꜰ", "g": "ɢ", "h": "ʜ",
+    "i": "ɪ", "j": "ᴊ", "k": "ᴋ", "l": "ʟ",
+    "m": "ᴍ", "n": "ɴ", "o": "ᴏ", "p": "ᴘ",
+    "q": "ǫ", "r": "ʀ", "s": "s", "t": "ᴛ",
+    "u": "ᴜ", "v": "ᴠ", "w": "ᴡ", "x": "x",
+    "y": "ʏ", "z": "ᴢ"
+}
 
 
-def parenthesis_text(text):
+def small_caps(text):
 
-    return "(" + text + ")"
-
-
-def angle_text(text):
-
-    return "〈" + text + "〉"
-
-
-def double_angle_text(text):
-
-    return "《" + text + "》"
-
-
-def curly_text(text):
-
-    return "{" + text + "}"
+    return "".join(
+        SMALL_CAPS.get(char.lower(), char)
+        for char in text
+    )
 
 
 # ============================================================
-# ۵۰ فونت تمیز انگلیسی
+# ۵۰ فونت انگلیسی تمیز
 # ============================================================
 
 def english_fonts(text):
 
-    fonts = []
-
-    # 1
-    fonts.append(
-        unicode_font(
-            text,
-            BOLD_UPPER,
-            BOLD_LOWER
-        )
-    )
-
-    # 2
-    fonts.append(
-        unicode_font(
-            text,
-            ITALIC_UPPER,
-            ITALIC_LOWER
-        )
-    )
-
-    # 3
-    fonts.append(
-        unicode_font(
-            text,
-            BOLD_ITALIC_UPPER,
-            BOLD_ITALIC_LOWER
-        )
-    )
-
-    # 4
-    fonts.append(
-        unicode_font(
-            text,
-            SCRIPT_UPPER,
-            SCRIPT_LOWER
-        )
-    )
-
-    # 5
-    fonts.append(
-        unicode_font(
-            text,
-            BOLD_SCRIPT_UPPER,
-            BOLD_SCRIPT_LOWER
-        )
-    )
-
-    # 6
-    fonts.append(
-        unicode_font(
-            text,
-            FRAKTUR_UPPER,
-            FRAKTUR_LOWER
-        )
-    )
-
-    # 7
-    fonts.append(
-        unicode_font(
-            text,
-            BOLD_FRAKTUR_UPPER,
-            BOLD_FRAKTUR_LOWER
-        )
-    )
-
-    # 8
-    fonts.append(
-        unicode_font(
-            text,
-            DOUBLE_UPPER,
-            DOUBLE_LOWER
-        )
-    )
-
-    # 9
-    fonts.append(
-        unicode_font(
-            text,
-            SANS_UPPER,
-            SANS_LOWER
-        )
-    )
-
-    # 10
-    fonts.append(
-        unicode_font(
-            text,
-            SANS_BOLD_UPPER,
-            SANS_BOLD_LOWER
-        )
-    )
-
-    # 11
-    fonts.append(
-        unicode_font(
-            text,
-            SANS_ITALIC_UPPER,
-            SANS_ITALIC_LOWER
-        )
-    )
-
-    # 12
-    fonts.append(
-        unicode_font(
-            text,
-            SANS_BOLD_ITALIC_UPPER,
-            SANS_BOLD_ITALIC_LOWER
-        )
-    )
-
-    # 13
-    fonts.append(
-        unicode_font(
-            text,
-            MONO_UPPER,
-            MONO_LOWER
-        )
-    )
-
-    # 14
-    fonts.append(
-        unicode_font(
-            text,
-            FULLWIDTH_UPPER,
-            FULLWIDTH_LOWER
-        )
-    )
-
-    # 15
-    fonts.append(
-        unicode_font(
-            text,
-            CIRCLED_UPPER,
-            CIRCLED_LOWER
-        )
-    )
-
-    # 16
-    fonts.append(
-        unicode_font(
-            text,
-            NEG_CIRCLED_UPPER,
-            NEG_CIRCLED_LOWER
-        )
-    )
-
-    # 17
-    fonts.append(
-        unicode_font(
-            text,
-            SQUARED_UPPER,
-            SQUARED_LOWER
-        )
-    )
-
-    # 18
-    fonts.append(
-        unicode_font(
-            text,
-            NEG_SQUARED_UPPER,
-            NEG_SQUARED_LOWER
-        )
-    )
-
-    # 19
-    fonts.append(
-        unicode_font(
-            text,
-            PAREN_UPPER,
-            PAREN_LOWER
-        )
-    )
-
-    # 20
-    small = ""
-
-    for char in text:
-
-        low = char.lower()
-
-        if low in SMALL_CAPS:
-            small += SMALL_CAPS[low]
-        else:
-            small += char
-
-    fonts.append(small)
-
-    # 21
-    fonts.append(
-        combine_style(
-            text,
-            "\u0332"
-        )
-    )
-
-    # 22
-    fonts.append(
-        combine_style(
-            text,
-            "\u0336"
-        )
-    )
-
-    # 23
-    fonts.append(
-        combine_style(
-            text,
-            "\u0335"
-        )
-    )
-
-    # 24
-    fonts.append(
-        combine_style(
-            text,
-            "\u0337"
-        )
-    )
-
-    # 25
-    fonts.append(
-        combine_style(
-            text,
-            "\u0338"
-        )
-    )
-
-    # 26
-    fonts.append(
-        combine_style(
-            text,
-            "\u0305"
-        )
-    )
-
-    # 27
-    fonts.append(
-        combine_style(
-            text,
-            "\u0307"
-        )
-    )
-
-    # 28
-    fonts.append(
-        combine_style(
-            text,
-            "\u0323"
-        )
-    )
-
-    # 29
-    fonts.append(
-        combine_style(
-            text,
-            "\u0308"
-        )
-    )
-
-    # 30
-    fonts.append(
-        combine_style(
-            text,
-            "\u030A"
-        )
-    )
-
-    # 31
-    fonts.append(
-        combine_style(
-            text,
-            "\u0304"
-        )
-    )
-
-    # 32
-    fonts.append(
-        combine_style(
-            text,
-            "\u0303"
-        )
-    )
-
-    # 33
-    fonts.append(
-        combine_style(
-            text,
-            "\u0302"
-        )
-    )
-
-    # 34
-    fonts.append(
-        combine_style(
-            text,
-            "\u030C"
-        )
-    )
-
-    # 35
-    fonts.append(
-        combine_style(
-            text,
-            "\u0306"
-        )
-    )
-
-    # 36
-    fonts.append(
-        combine_style(
-            text,
-            "\u0301"
-        )
-    )
-
-    # 37
-    fonts.append(
-        combine_style(
-            text,
-            "\u0300"
-        )
-    )
-
-    # 38
-    fonts.append(
-        spaced_text(text)
-    )
-
-    # 39
-    fonts.append(
-        boxed_text(text)
-    )
-
-    # 40
-    fonts.append(
-        bracket_text(text)
-    )
-
-    # 41
-    fonts.append(
-        parenthesis_text(text)
-    )
-
-    # 42
-    fonts.append(
-        angle_text(text)
-    )
-
-    # 43
-    fonts.append(
-        double_angle_text(text)
-    )
-
-    # 44
-    fonts.append(
-        curly_text(text)
-    )
-
-    # 45
-    fonts.append(
-        "【" + text + "】"
-    )
-
-    # 46
-    fonts.append(
-        "[" + text + "]"
-    )
-
-    # 47
-    fonts.append(
-        "<" + text + ">"
-    )
-
-    # 48
-    fonts.append(
-        "_" + text + "_"
-    )
-
-    # 49
-    fonts.append(
-        "-" + text + "-"
-    )
-
-    # 50
-    fonts.append(
-        "=" + text + "="
-    )
-
-    return fonts[:50]
-
-
-# ============================================================
-# فونت‌های فارسی
-# ============================================================
-
-def persian_fonts(text):
-
     fonts = [
 
-        f"『 {text} 』",
+        unicode_font(text, BOLD_U, BOLD_L),
+        unicode_font(text, ITALIC_U, ITALIC_L),
+        unicode_font(text, BOLD_ITALIC_U, BOLD_ITALIC_L),
+        unicode_font(text, SCRIPT_U, SCRIPT_L),
+        unicode_font(text, BOLD_SCRIPT_U, BOLD_SCRIPT_L),
+        unicode_font(text, FRAKTUR_U, FRAKTUR_L),
+        unicode_font(text, BOLD_FRAKTUR_U, BOLD_FRAKTUR_L),
+        unicode_font(text, DOUBLE_U, DOUBLE_L),
+        unicode_font(text, SANS_U, SANS_L),
+        unicode_font(text, SANS_BOLD_U, SANS_BOLD_L),
+        unicode_font(text, SANS_ITALIC_U, SANS_ITALIC_L),
+        unicode_font(text, SANS_BOLD_ITALIC_U, SANS_BOLD_ITALIC_L),
+        unicode_font(text, MONO_U, MONO_L),
+        unicode_font(text, FULL_U, FULL_L),
+        small_caps(text),
 
-        f"【 {text} 】",
+        combine_style(text, "\u0332"),
+        combine_style(text, "\u0336"),
+        combine_style(text, "\u0335"),
+        combine_style(text, "\u0337"),
+        combine_style(text, "\u0338"),
+        combine_style(text, "\u0305"),
+        combine_style(text, "\u0307"),
+        combine_style(text, "\u0323"),
+        combine_style(text, "\u0308"),
+        combine_style(text, "\u030A"),
+        combine_style(text, "\u0304"),
+        combine_style(text, "\u0303"),
+        combine_style(text, "\u0302"),
+        combine_style(text, "\u030C"),
+        combine_style(text, "\u0306"),
+        combine_style(text, "\u0301"),
+        combine_style(text, "\u0300"),
 
-        f"〖 {text} 〗",
-
-        f"〘 {text} 〙",
-
-        f"〚 {text} 〛",
-
-        f"《 {text} 》",
-
-        f"〈 {text} 〉",
-
-        f"「 {text} 」",
-
-        f"『{text}』",
-
+        " ".join(text),
         f"【{text}】",
-
-        f"꧁ {text} ꧂",
-
-        f"꧁༺ {text} ༻꧂",
-
-        f"༺ {text} ༻",
-
-        f"𓆩 {text} 𓆪",
-
-        f"✦ {text} ✦",
-
-        f"✧ {text} ✧",
-
-        f"★ {text} ★",
-
-        f"☆ {text} ☆",
-
-        f"☾ {text} ☽",
-
-        f"☽ {text} ☾",
-
-        f"♡ {text} ♡",
-
-        f"♥ {text} ♥",
-
-        f"♛ {text} ♛",
-
-        f"♕ {text} ♕",
-
-        f"⚡ {text} ⚡",
-
-        f"🔥 {text} 🔥",
-
-        f"💎 {text} 💎",
-
-        f"👑 {text} 👑",
-
-        f"• {text} •",
-
-        f"● {text} ●",
-
-        f"○ {text} ○",
-
-        f"◉ {text} ◉",
-
-        f"◆ {text} ◆",
-
-        f"◇ {text} ◇",
-
-        f"⬢ {text} ⬢",
-
-        f"⟡ {text} ⟡",
-
-        f"⟢ {text} ⟣",
-
-        f"╰┈➤ {text}",
-
-        f"➤ {text}",
-
-        f"➳ {text}",
-
-        f"➵ {text}",
-
-        f"➸ {text}",
-
-        f"❖ {text} ❖",
-
-        f"✺ {text} ✺",
-
-        f"✹ {text} ✹",
-
-        f"✷ {text} ✷",
-
-        f"✵ {text} ✵",
-
-        f"✿ {text} ✿"
+        f"『{text}』",
+        f"「{text}」",
+        f"〖{text}〗",
+        f"〘{text}〙",
+        f"〚{text}〛",
+        f"《{text}》",
+        f"〈{text}〉",
+        f"〔{text}〕",
+        f"⟦{text}⟧",
+        f"⟨{text}⟩",
+        f"⟪{text}⟫",
+        f"⟮{text}⟯",
+        f"({text})",
+        f"[{text}]",
+        f"{{{text}}}",
+        f"<{text}>",
+        f"_{text}_",
+        f"-{text}-",
+        f"={text}=",
+        f"|{text}|",
+        f"/{text}/"
 
     ]
 
@@ -1057,7 +336,70 @@ def persian_fonts(text):
 
 
 # ============================================================
-# تشخیص فارسی / انگلیسی
+# ۵۰ استایل فارسی
+# ============================================================
+
+def persian_fonts(text):
+
+    fonts = [
+
+        f"『 {text} 』",
+        f"〖 {text} 〗",
+        f"〘 {text} 〙",
+        f"〚 {text} 〛",
+        f"《 {text} 》",
+        f"〈 {text} 〉",
+        f"「 {text} 」",
+        f"【 {text} 】",
+        f"〔 {text} 〕",
+        f"⟦ {text} ⟧",
+        f"⟨ {text} ⟩",
+        f"⟪ {text} ⟫",
+        f"⟮ {text} ⟯",
+        f"({text})",
+        f"[{text}]",
+        f"{{{text}}}",
+        f"<{text}>",
+        f"| {text} |",
+        f"/ {text} /",
+        f"\\ {text} /",
+
+        f"✦ {text} ✦",
+        f"✧ {text} ✧",
+        f"★ {text} ★",
+        f"☆ {text} ☆",
+        f"☾ {text} ☽",
+        f"☽ {text} ☾",
+        f"♡ {text} ♡",
+        f"♥ {text} ♥",
+        f"♛ {text} ♛",
+        f"♕ {text} ♕",
+        f"• {text} •",
+        f"● {text} ●",
+        f"○ {text} ○",
+        f"◉ {text} ◉",
+        f"◆ {text} ◆",
+        f"◇ {text} ◇",
+        f"⬢ {text} ⬢",
+        f"⟡ {text} ⟡",
+        f"❖ {text} ❖",
+        f"✺ {text} ✺",
+        f"✹ {text} ✹",
+        f"✷ {text} ✷",
+        f"✵ {text} ✵",
+        f"✿ {text} ✿",
+        f"༺ {text} ༻",
+        f"꧁ {text} ꧂",
+        f"𓆩 {text} 𓆪",
+        f"╰┈➤ {text}"
+
+    ]
+
+    return fonts[:50]
+
+
+# ============================================================
+# تشخیص زبان
 # ============================================================
 
 def is_english_text(text):
@@ -1067,60 +409,41 @@ def is_english_text(text):
     for char in text:
 
         if char.isalpha() and char.isascii():
-
             has_english = True
 
         elif char.isalpha():
-
             return False
 
     return has_english
 
 
-# ============================================================
-# ساخت خروجی
-# ============================================================
-
 def make_fonts(text):
 
     if is_english_text(text):
-
         return english_fonts(text)
 
     return persian_fonts(text)
 
 
 # ============================================================
-# تشخیص دستور فونت
+# تشخیص دستور
 # ============================================================
 
 def get_font_name(text):
 
     text = text.strip()
 
-    # فارسی
-
     if text.startswith("فونت"):
+        return text[4:].strip()
 
-        name = text[4:].strip()
-
-        return name
-
-    # انگلیسی
-
-    lower = text.lower()
-
-    if lower.startswith("font"):
-
-        name = text[4:].strip()
-
-        return name
+    if text.lower().startswith("font"):
+        return text[4:].strip()
 
     return None
 
 
 # ============================================================
-# ساخت پیام
+# ساخت پاسخ
 # ============================================================
 
 def create_response(name):
@@ -1132,11 +455,7 @@ def create_response(name):
         f"━━━━━━━━━━━━━━\n\n"
     )
 
-    for i, font in enumerate(
-        fonts,
-        1
-    ):
-
+    for i, font in enumerate(fonts, 1):
         result += f"{i}. {font}\n"
 
     result += (
@@ -1159,9 +478,7 @@ def process_update(update):
     if update.get("type") != "NewMessage":
         return
 
-    message = update.get(
-        "new_message"
-    )
+    message = update.get("new_message")
 
     if not message:
         return
@@ -1171,20 +488,13 @@ def process_update(update):
     if not text:
         return
 
-    chat_id = update.get(
-        "chat_id"
-    )
+    chat_id = update.get("chat_id")
+    message_id = message.get("message_id")
 
-    message_id = message.get(
-        "message_id"
+    print(
+        f"📩 پیام جدید | {text}",
+        flush=True
     )
-
-    print()
-    print("==============================")
-    print("📩 پیام جدید")
-    print("Chat:", chat_id)
-    print("Text:", text)
-    print("==============================")
 
     name = get_font_name(text)
 
@@ -1194,30 +504,21 @@ def process_update(update):
     if not name:
 
         send_message(
-
             chat_id,
-
             "❌ اسم موردنظرت رو بعد از فونت بنویس.\n\n"
-
             "مثال:\n"
             "فونت ARSHIA\n\n"
-
             "یا:\n"
             "فونت یاسنا"
         )
 
         return
 
-    print("🔤 Name:", name)
-
     response = create_response(name)
 
     send_message(
-
         chat_id,
-
         response,
-
         message_id
     )
 
@@ -1231,7 +532,8 @@ def skip_old_updates():
     global offset_id
 
     print(
-        "🧹 در حال رد کردن پیام‌های قبلی..."
+        "🧹 در حال رد کردن پیام‌های قبلی...",
+        flush=True
     )
 
     skipped = 0
@@ -1241,7 +543,6 @@ def skip_old_updates():
         data = {}
 
         if offset_id:
-
             data["offset_id"] = offset_id
 
         result = api(
@@ -1251,24 +552,18 @@ def skip_old_updates():
 
         if not result:
 
-            print(
-                "⚠️ دریافت صف اولیه ناموفق بود."
-            )
-
             time.sleep(2)
-
             continue
 
         if result.get("status") != "OK":
 
             print(
-                "⚠️ پاسخ نامعتبر:"
+                "⚠️ پاسخ نامعتبر:",
+                result,
+                flush=True
             )
 
-            print(result)
-
             time.sleep(2)
-
             continue
 
         response_data = result.get(
@@ -1286,28 +581,23 @@ def skip_old_updates():
         )
 
         if next_offset:
-
             offset_id = next_offset
+
+        if not updates:
+            break
 
         skipped += len(updates)
 
-        if not updates:
-
-            break
-
         print(
-            f"🗑️ {len(updates)} پیام قدیمی رد شد."
+            f"🗑️ {len(updates)} پیام قدیمی رد شد.",
+            flush=True
         )
 
         time.sleep(0.2)
 
     print(
-        f"✅ مجموع پیام‌های قدیمی رد شده: {skipped}"
-    )
-
-    print(
-        "➡️ Offset:",
-        offset_id
+        f"✅ مجموع پیام‌های قدیمی رد شده: {skipped}",
+        flush=True
     )
 
 
@@ -1322,7 +612,6 @@ def get_new_updates():
     data = {}
 
     if offset_id:
-
         data["offset_id"] = offset_id
 
     return api(
@@ -1332,40 +621,34 @@ def get_new_updates():
 
 
 # ============================================================
-# شروع ربات
+# شروع
 # ============================================================
 
-print("=" * 50)
-
-print(
-    "          FONT MAKER RUBIKA BOT"
-)
-
-print("=" * 50)
-
-print()
+print("=" * 50, flush=True)
+print("       FONT MAKER RUBIKA BOT", flush=True)
+print("=" * 50, flush=True)
 
 skip_old_updates()
 
-print()
-
 print(
-    "🤖 ربات روشن شد."
+    "🤖 ربات روشن شد.",
+    flush=True
 )
 
 print(
-    "📱 پیوی و گروه فعال هستند."
+    "📱 پیوی و گروه فعال هستند.",
+    flush=True
 )
 
 print(
-    "💬 مثال: فونت ARSHIA"
+    "💬 مثال: فونت ARSHIA",
+    flush=True
 )
 
 print(
-    "💬 مثال: فونت یاسنا"
+    "💬 مثال: فونت یاسنا",
+    flush=True
 )
-
-print()
 
 
 # ============================================================
@@ -1381,18 +664,17 @@ while True:
         if not result:
 
             time.sleep(2)
-
             continue
 
         if result.get("status") != "OK":
 
             print(
                 "⚠️ پاسخ نامعتبر:",
-                result
+                result,
+                flush=True
             )
 
             time.sleep(3)
-
             continue
 
         data = result.get(
@@ -1410,11 +692,9 @@ while True:
         )
 
         if next_offset:
-
             offset_id = next_offset
 
         for update in updates:
-
             process_update(update)
 
         time.sleep(1)
@@ -1422,7 +702,8 @@ while True:
     except KeyboardInterrupt:
 
         print(
-            "\n🛑 ربات متوقف شد."
+            "\n🛑 ربات متوقف شد.",
+            flush=True
         )
 
         break
@@ -1431,7 +712,8 @@ while True:
 
         print(
             "\n❌ خطای اصلی:",
-            e
+            e,
+            flush=True
         )
 
         time.sleep(3)
