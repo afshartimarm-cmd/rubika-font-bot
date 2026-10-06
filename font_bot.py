@@ -3,7 +3,7 @@ import time
 import urllib.request
 import os
 import threading
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 
 # =========================================
@@ -21,14 +21,14 @@ offset_id = None
 
 
 # =========================================
-# HTTP HEALTH SERVER برای Render
+# HTTP SERVER برای Render
 # =========================================
 
 class HealthHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
 
-        if self.path == "/health":
+        if self.path == "/" or self.path == "/health":
 
             self.send_response(200)
 
@@ -39,7 +39,9 @@ class HealthHandler(BaseHTTPRequestHandler):
 
             self.end_headers()
 
-            self.wfile.write(b"OK")
+            self.wfile.write(
+                b"OK"
+            )
 
         else:
 
@@ -47,27 +49,49 @@ class HealthHandler(BaseHTTPRequestHandler):
             self.end_headers()
 
     def log_message(self, format, *args):
-        return
+        pass
 
 
 def start_health_server():
 
-    port = int(os.environ.get("PORT", 10000))
-
-    server = HTTPServer(
-        ("0.0.0.0", port),
-        HealthHandler
+    port = int(
+        os.environ.get(
+            "PORT",
+            "10000"
+        )
     )
 
-    print(f"🌐 Health server running on port {port}")
+    try:
 
-    server.serve_forever()
+        server = ThreadingHTTPServer(
+            ("0.0.0.0", port),
+            HealthHandler
+        )
+
+        print(
+            f"🌐 HTTP server listening on 0.0.0.0:{port}",
+            flush=True
+        )
+
+        server.serve_forever()
+
+    except Exception as e:
+
+        print(
+            f"❌ HTTP SERVER ERROR: {e}",
+            flush=True
+        )
 
 
-threading.Thread(
+# اول سرور Render را روشن می‌کنیم
+health_thread = threading.Thread(
     target=start_health_server,
     daemon=True
-).start()
+)
+
+health_thread.start()
+
+time.sleep(1)
 
 
 # =========================================
@@ -84,9 +108,7 @@ def api(method, data=None):
     try:
 
         request = urllib.request.Request(
-
             url,
-
             data=json.dumps(
                 data,
                 ensure_ascii=False
@@ -110,7 +132,11 @@ def api(method, data=None):
 
     except Exception as e:
 
-        print("❌ API ERROR:", e)
+        print(
+            "❌ API ERROR:",
+            e,
+            flush=True
+        )
 
         return None
 
@@ -139,10 +165,12 @@ def send_message(
     )
 
     if result:
-        print("📤 پیام ارسال شد.")
+        print(
+            "📤 پیام ارسال شد.",
+            flush=True
+        )
 
-    return result
-
+    return result 
 
 # ============================================================
 # فونت‌های انگلیسی
